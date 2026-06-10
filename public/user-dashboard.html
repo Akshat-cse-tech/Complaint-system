@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Complaint Admin Panel</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  display: flex;
+  height: 100vh;
+  background: #f4f6f9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  color: #cbd5e1;
+  margin: 10px 0;
+  text-decoration: none;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.header {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.refresh {
+  background: #2563eb;
+  color: white;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+/* Card */
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.title {
+  font-weight: bold;
+}
+
+.desc {
+  margin-top: 5px;
+  color: #555;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  background: orange;
+  color: white;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.resolve {
+  background: green;
+  color: white;
+}
+
+.delete {
+  background: red;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Admin Panel</h2>
+  <a href="/">Dashboard</a>
+  <a href="#">Complaints</a>
+  <a href="#">Users</a>
+</div>
+
+<div class="main">
+
+  <div class="header">Complaint Dashboard</div>
+
+  <div class="topbar">
+    <h3>All Complaints</h3>
+    <button class="refresh" onclick="load()">Refresh</button>
+  </div>
+
+  <div class="grid" id="list"></div>
+
+</div>
+
+<script>
+
+async function load() {
+  const res = await fetch("/complaints");
+  const data = await res.json();
+
+  document.getElementById("list").innerHTML = data.map(c => `
+    <div class="card">
+      <div class="title">${c.title}</div>
+      <div class="desc">${c.description || ""}</div>
+
+      <div class="status"
+        style="background:${c.status === 'resolved' ? 'green' : 'orange'}">
+        ${c.status}
+      </div>
+
+      <div class="actions">
+        <button class="resolve" onclick="resolve('${c._id}')">Resolve</button>
+        <button class="delete" onclick="removeItem('${c._id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function resolve(id) {
+  await fetch(`/complaints/${id}`, { method: "PUT" });
+  load();
+}
+
+async function removeItem(id) {
+  await fetch(`/complaints/${id}`, { method: "DELETE" });
+  load();
+}
+
+load();
+
+</script>
+
+</body>
+</html>

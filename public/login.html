@@ -1,0 +1,579 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  #app {
+    font-family: 'DM Sans', sans-serif;
+    background: #0f1117;
+    min-height: 600px;
+    color: #e8eaf0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bg-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image: linear-gradient(rgba(99,102,241,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-glow {
+    position: absolute; width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px; z-index: 0; pointer-events: none;
+  }
+
+  /* LOGIN SCREEN */
+  #login-screen {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 600px; padding: 2rem;
+    animation: fadeIn 0.6s ease;
+  }
+
+  .login-card {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    width: 100%; max-width: 380px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 60px rgba(99,102,241,0.1);
+  }
+
+  .login-logo {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 22px; color: white;
+  }
+
+  .login-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: #fff; margin-bottom: 4px;
+  }
+
+  .login-sub {
+    font-size: 13px; color: rgba(255,255,255,0.45);
+    margin-bottom: 2rem;
+  }
+
+  .field-group { margin-bottom: 1rem; }
+
+  .field-label {
+    font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 6px; display: block;
+  }
+
+  .field-input {
+    width: 100%; padding: 10px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 10px; color: #fff;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  .field-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  }
+
+  .login-btn {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 15px; font-weight: 600;
+    font-family: 'Sora', sans-serif;
+    cursor: pointer; margin-top: 0.5rem;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+
+  .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .login-btn:active { transform: scale(0.98); }
+
+  .login-hint {
+    font-size: 11.5px; color: rgba(255,255,255,0.3);
+    text-align: center; margin-top: 1.2rem;
+  }
+
+  .login-error {
+    background: rgba(239,68,68,0.12);
+    border: 0.5px solid rgba(239,68,68,0.3);
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 13px; color: #f87171;
+    margin-bottom: 1rem; display: none;
+  }
+
+  /* DASHBOARD */
+  #dashboard {
+    display: none; position: relative; z-index: 1;
+    min-height: 600px; flex-direction: column;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .topbar-brand {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .brand-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #6366f1;
+    box-shadow: 0 0 8px #6366f1;
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .user-badge {
+    background: rgba(99,102,241,0.15);
+    border: 0.5px solid rgba(99,102,241,0.3);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 12px; color: #a5b4fc;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .logout-btn {
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 8px; padding: 5px 12px;
+    color: rgba(255,255,255,0.5); font-size: 12px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .logout-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; padding: 1rem 1.5rem;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 0.9rem 1rem;
+  }
+
+  .stat-num {
+    font-family: 'Sora', sans-serif;
+    font-size: 26px; font-weight: 700; color: #fff;
+  }
+
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  .stat-card.s-open .stat-num { color: #f59e0b; }
+  .stat-card.s-resolved .stat-num { color: #34d399; }
+  .stat-card.s-total .stat-num { color: #a5b4fc; }
+
+  .main-content { padding: 0 1.5rem 1.5rem; flex: 1; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px; font-weight: 600; color: #fff;
+  }
+
+  .new-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: #6366f1; border: none; border-radius: 8px;
+    padding: 7px 14px; color: #fff;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .new-btn:hover { background: #818cf8; transform: translateY(-1px); }
+
+  .complaint-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .complaint-card {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 1rem 1.1rem;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    transition: border-color 0.2s, transform 0.15s;
+    animation: slideUp 0.3s ease both;
+  }
+
+  .complaint-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+  .complaint-card.resolved { border-left: 3px solid #34d399; }
+  .complaint-card.open { border-left: 3px solid #f59e0b; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .c-left { flex: 1; }
+
+  .c-title {
+    font-size: 14px; font-weight: 500; color: #e8eaf0; margin-bottom: 4px;
+  }
+
+  .c-desc {
+    font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .c-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 2px 9px;
+    border-radius: 20px; letter-spacing: 0.03em;
+  }
+
+  .badge-open { background: rgba(245,158,11,0.15); color: #f59e0b; border: 0.5px solid rgba(245,158,11,0.3); }
+  .badge-resolved { background: rgba(52,211,153,0.1); color: #34d399; border: 0.5px solid rgba(52,211,153,0.25); }
+
+  .c-date { font-size: 11px; color: rgba(255,255,255,0.25); }
+
+  .c-category {
+    font-size: 11px; color: #a5b4fc;
+    background: rgba(99,102,241,0.1); border-radius: 20px; padding: 2px 8px;
+  }
+
+  .c-actions { display: flex; gap: 6px; flex-shrink: 0; margin-top: 2px; }
+
+  .action-btn {
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 7px; padding: 5px 10px;
+    font-size: 11.5px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.18s; background: transparent;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .resolve-btn { color: #34d399; border-color: rgba(52,211,153,0.25); }
+  .resolve-btn:hover { background: rgba(52,211,153,0.1); border-color: #34d399; }
+  .resolve-btn:disabled { opacity: 0.35; cursor: default; }
+
+  .delete-btn { color: #f87171; border-color: rgba(248,113,113,0.2); }
+  .delete-btn:hover { background: rgba(248,113,113,0.1); border-color: #f87171; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: absolute; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.6); display: none;
+    align-items: center; justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #181a25;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 16px; padding: 1.5rem;
+    width: 100%; max-width: 380px;
+    animation: popIn 0.25s ease;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px; font-weight: 700; color: #fff;
+    margin-bottom: 1.2rem;
+  }
+
+  .modal-field { margin-bottom: 0.9rem; }
+
+  .modal-label {
+    font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,0.45);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 5px; display: block;
+  }
+
+  .modal-input, .modal-select, .modal-textarea {
+    width: 100%; padding: 9px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.14);
+    border-radius: 9px; color: #fff;
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border 0.2s, box-shadow 0.2s;
+  }
+  .modal-input:focus, .modal-select:focus, .modal-textarea:focus {
+    border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+  }
+  .modal-select option { background: #181a25; }
+  .modal-textarea { resize: vertical; min-height: 70px; }
+
+  .modal-actions { display: flex; gap: 8px; margin-top: 1.2rem; }
+
+  .modal-submit {
+    flex: 1; padding: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none; border-radius: 9px; color: #fff;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: 'Sora', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .modal-submit:hover { opacity: 0.88; }
+
+  .modal-cancel {
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 9px; color: rgba(255,255,255,0.5);
+    font-size: 14px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .modal-cancel:hover { color: #fff; }
+
+  .empty-state {
+    text-align: center; padding: 3rem 1rem;
+    color: rgba(255,255,255,0.2); font-size: 14px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .tab-bar {
+    display: flex; gap: 6px; padding: 0.75rem 1.5rem 0;
+  }
+
+  .tab {
+    font-size: 12px; padding: 5px 14px; border-radius: 20px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.4); background: transparent;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: rgba(99,102,241,0.15);
+    border-color: rgba(99,102,241,0.4);
+    color: #a5b4fc;
+  }
+  .tab:hover:not(.active) { color: #fff; }
+</style>
+
+<div id="app">
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-logo"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+      <div class="login-title">ComplaintDesk</div>
+      <div class="login-sub">College Placement Portal — Secure Login</div>
+      <div class="login-error" id="login-error"><i class="ti ti-alert-circle" aria-hidden="true"></i> Invalid credentials. Try admin / admin123</div>
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <input class="field-input" id="username" type="text" placeholder="Enter username" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" id="password" type="password" placeholder="Enter password" />
+      </div>
+      <button class="login-btn" onclick="doLogin()">Sign In →</button>
+      <div class="login-hint">Demo: admin / admin123 &nbsp;|&nbsp; student / pass123</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="topbar">
+      <div class="topbar-brand"><div class="brand-dot"></div> ComplaintDesk</div>
+      <div class="topbar-right">
+        <div class="user-badge"><i class="ti ti-user" style="font-size:14px" aria-hidden="true"></i> <span id="logged-user">admin</span></div>
+        <button class="logout-btn" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card s-total"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Complaints</div></div>
+      <div class="stat-card s-open"><div class="stat-num" id="stat-open">0</div><div class="stat-label">Open</div></div>
+      <div class="stat-card s-resolved"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab active" onclick="filterTab('all', this)">All</button>
+      <button class="tab" onclick="filterTab('open', this)">Open</button>
+      <button class="tab" onclick="filterTab('resolved', this)">Resolved</button>
+    </div>
+
+    <div class="main-content" style="margin-top:1rem">
+      <div class="section-header">
+        <div class="section-title">Complaints</div>
+        <button class="new-btn" onclick="openModal()"><i class="ti ti-plus" aria-hidden="true"></i> New Complaint</button>
+      </div>
+      <div class="complaint-list" id="complaint-list"></div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title"><i class="ti ti-file-plus" style="font-size:18px;vertical-align:-3px;margin-right:6px" aria-hidden="true"></i>File New Complaint</div>
+      <div class="modal-field">
+        <label class="modal-label">Title</label>
+        <input class="modal-input" id="c-title" placeholder="Brief complaint title" />
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Category</label>
+        <select class="modal-select" id="c-cat">
+          <option>Placement Process</option>
+          <option>Faculty</option>
+          <option>Infrastructure</option>
+          <option>Exam / Grading</option>
+          <option>Hostel</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Description</label>
+        <textarea class="modal-textarea" id="c-desc" placeholder="Describe the issue in detail..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-submit" onclick="submitComplaint()">Submit Complaint</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CREDENTIALS = { admin: 'admin123', student: 'pass123' };
+  let complaints = [
+    { id: 1, title: 'Placement drive not notified on time', category: 'Placement Process', desc: 'Students were informed about the TCS drive only one day before. More lead time is needed.', status: 'open', date: '2024-06-01', by: 'student' },
+    { id: 2, title: 'Projector not working in Lab 3', category: 'Infrastructure', desc: 'The projector has been faulty for two weeks. Multiple requests have been ignored.', status: 'resolved', date: '2024-05-28', by: 'student' },
+    { id: 3, title: 'Grade sheet discrepancy', category: 'Exam / Grading', desc: 'My internal marks in Operating Systems subject do not match the marks I scored in the exam.', status: 'open', date: '2024-06-03', by: 'admin' },
+  ];
+  let currentFilter = 'all';
+  let nextId = 4;
+
+  function doLogin() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const err = document.getElementById('login-error');
+    if (CREDENTIALS[u] && CREDENTIALS[u] === p) {
+      err.style.display = 'none';
+      document.getElementById('logged-user').textContent = u;
+      document.getElementById('login-screen').style.display = 'none';
+      const dash = document.getElementById('dashboard');
+      dash.style.display = 'flex';
+      renderComplaints();
+    } else {
+      err.style.display = 'block';
+    }
+  }
+
+  document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('username').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  function doLogout() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+  }
+
+  function updateStats() {
+    const total = complaints.length;
+    const open = complaints.filter(c => c.status === 'open').length;
+    const resolved = complaints.filter(c => c.status === 'resolved').length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-open').textContent = open;
+    document.getElementById('stat-resolved').textContent = resolved;
+  }
+
+  function renderComplaints() {
+    updateStats();
+    const list = document.getElementById('complaint-list');
+    const visible = currentFilter === 'all' ? complaints : complaints.filter(c => c.status === currentFilter);
+    if (visible.length === 0) {
+      list.innerHTML = '<div class="empty-state"><i class="ti ti-mood-happy" style="font-size:32px;display:block;margin-bottom:8px"></i>No complaints here.</div>';
+      return;
+    }
+    list.innerHTML = visible.map((c, i) => `
+      <div class="complaint-card ${c.status}" style="animation-delay:${i * 0.06}s">
+        <div class="c-left">
+          <div class="c-title">${c.title}</div>
+          <div class="c-desc">${c.desc}</div>
+          <div class="c-meta">
+            <span class="badge badge-${c.status}">${c.status === 'open' ? '⏳ Open' : '✓ Resolved'}</span>
+            <span class="c-category">${c.category}</span>
+            <span class="c-date">${c.date}</span>
+          </div>
+        </div>
+        <div class="c-actions">
+          <button class="action-btn resolve-btn" onclick="resolveComplaint(${c.id})" ${c.status === 'resolved' ? 'disabled' : ''}>
+            <i class="ti ti-circle-check" aria-hidden="true"></i> Resolve
+          </button>
+          <button class="action-btn delete-btn" onclick="deleteComplaint(${c.id})">
+            <i class="ti ti-trash" aria-hidden="true"></i> Delete
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function resolveComplaint(id) {
+    const c = complaints.find(x => x.id === id);
+    if (c) { c.status = 'resolved'; renderComplaints(); }
+  }
+
+  function deleteComplaint(id) {
+    complaints = complaints.filter(x => x.id !== id);
+    renderComplaints();
+  }
+
+  function filterTab(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderComplaints();
+  }
+
+  function openModal() {
+    document.getElementById('modal').classList.add('open');
+    document.getElementById('c-title').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('c-title').value = '';
+    document.getElementById('c-desc').value = '';
+  }
+
+  function submitComplaint() {
+    const title = document.getElementById('c-title').value.trim();
+    const desc = document.getElementById('c-desc').value.trim();
+    const cat = document.getElementById('c-cat').value;
+    if (!title || !desc) { alert('Please fill in the title and description.'); return; }
+    const today = new Date().toISOString().slice(0, 10);
+    complaints.unshift({ id: nextId++, title, category: cat, desc, status: 'open', date: today, by: document.getElementById('logged-user').textContent });
+    closeModal();
+    renderComplaints();
+  }
+</script>

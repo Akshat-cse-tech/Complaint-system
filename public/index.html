@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Complaint System</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f4f6f9;
+}
+
+.topbar {
+  background: #111827;
+  color: white;
+  padding: 15px;
+  font-size: 18px;
+}
+
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: #1f2937;
+  color: white;
+  padding: 20px;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+input, textarea {
+  width: 300px;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn {
+  background: #2563eb;
+  color: white;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+.status {
+  background: orange;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+Complaint Management System
+</div>
+
+<div class="container">
+
+  <div class="sidebar">
+    <h3>Menu</h3>
+    <p>Dashboard</p>
+  </div>
+
+  <div class="main">
+
+    <h2>Add Complaint</h2>
+
+    <input id="title" placeholder="Title"><br>
+    <textarea id="desc" placeholder="Description"></textarea><br>
+
+    <button class="btn" onclick="addComplaint()">Submit</button>
+
+    <h2>Complaints</h2>
+    <div id="list"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+const API = 'http://localhost:5000/api';
+let TOKEN = '';
+
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const res = await fetch(`${API}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    document.getElementById('login-error').style.display = 'block';
+    return;
+  }
+  TOKEN = data.token;
+  document.getElementById('logged-user').textContent = data.username;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  loadComplaints();
+}
+
+async function loadComplaints() {
+  const res = await fetch(`${API}/complaints`, {
+    headers: { Authorization: `Bearer ${TOKEN}` }
+  });
+  complaints = await res.json();
+  renderComplaints();
+}
+
+async function resolveComplaint(id) {
+  await fetch(`${API}/complaints/${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${TOKEN}` }
+  });
+  loadComplaints();
+}
+
+async function deleteComplaint(id) {
+  await fetch(`${API}/complaints/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${TOKEN}` }
+  });
+  loadComplaints();
+}
+
+async function submitComplaint() {
+  const title = document.getElementById('c-title').value.trim();
+  const desc  = document.getElementById('c-desc').value.trim();
+  const category = document.getElementById('c-cat').value;
+  if (!title || !desc) return alert('Fill in all fields');
+  await fetch(`${API}/complaints`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+    body: JSON.stringify({ title, desc, category })
+  });
+  closeModal();
+  loadComplaints();
+}
+</script>
+
+</body>
+</html>
