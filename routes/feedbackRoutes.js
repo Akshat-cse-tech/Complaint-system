@@ -2,7 +2,7 @@ const router = require('express').Router();
 const auth = require('../middleware/auth');
 const {
   submitFeedback, getFeedback, getMyFeedback, getStats
-} = require('../controllers/feedbackcontroller');
+} = require('../controllers/feedbackController');
 
 router.post('/',        auth, submitFeedback);
 router.get('/',         auth, getFeedback);
